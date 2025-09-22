@@ -1,6 +1,89 @@
-# RAG (Retrieval-Augmented Generation) Project
+# Mini RAG + Reranker
 
-This project implements a Retrieval-Augmented Generation (RAG) pipeline for document search and question answering over a collection of industrial safety documents. It leverages embedding-based search, FAISS indexing, and reranking to provide relevant answers from a curated set of PDFs and other resources.
+This project implements a **mini Retrieval-Augmented Generation (RAG)** pipeline with PDF ingestion, embeddings, FAISS vector search, BM25, and a hybrid reranker. It also includes both a **FastAPI backend** and a **Streamlit frontend** for asking questions against ingested documents.
+
+---
+
+## Repository Structure
+mini-rag-reranker/
+├─ data/
+│ ├─ industrial-safety-pdfs.zip # (your PDF dataset)
+│ ├─ sources.json # list of PDF sources (title, url/path)
+│ └─ questions.txt # evaluation questions
+├─ ingest.py # ingest + chunk -> sqlite
+├─ embed_index.py # embeddings + FAISS index
+├─ baseline_search.py # baseline cosine similarity search
+├─ reranker.py # hybrid reranker (FAISS + BM25)
+├─ api.py # FastAPI server with POST /ask
+├─ streamlit_app.py # Streamlit frontend for Q&A
+├─ utils.py # helper functions
+├─ requirements.txt
+└─ README.md
+
+
+---
+
+## 🚀 Setup
+
+1. Clone the repo and navigate inside:
+
+   ```bash
+   git clone https://github.com/your-username/mini-rag-reranker.git
+   cd mini-rag-reranker
+
+   Usage
+1. Ingest PDFs
+
+Parses sources.json, downloads/loads PDFs, chunks them, and saves to db.sqlite.
+
+python ingest.py
+
+2. Build embeddings + FAISS index
+
+Creates vector embeddings and saves FAISS index to disk.
+
+python embed_index.py
+
+
+3. Test baseline search
+
+Runs a simple cosine similarity search over embeddings.
+
+python baseline_search.py
+
+
+4. Test reranker
+
+Combines FAISS vector search with BM25 to rerank answers.
+
+python reranker.py
+
+
+5. Run API (FastAPI)
+
+Start the backend:
+
+uvicorn api:app --reload
+
+
+Open API docs at: http://127.0.0.1:8000/docs
+
+
+
+Example CURL Requests
+
+Easy query:
+
+curl -X POST "http://127.0.0.1:8000/ask" \
+     -H "Content-Type: application/json" \
+     -d '{"query": "What is FAISS used for?"}'
+
+
+Tricky query:
+
+curl -X POST "http://127.0.0.1:8000/ask" \
+     -H "Content-Type: application/json" \
+     -d '{"query": "How does reranking improve retrieval over pure FAISS search?"}'
 
 ## Features
 - **Document Ingestion:** Parses and indexes PDF documents from the `Data/industrial-safety-pdfs` and `pdfs/` directories.
@@ -10,65 +93,5 @@ This project implements a Retrieval-Augmented Generation (RAG) pipeline for docu
 - **Baseline Search:** Provides a baseline search method for comparison.
 - **SQLite Database:** Stores metadata and indexing information.
 
-## Project Structure
-```
-api.py                # API server (FastAPI/Flask)
-baseline_search.py    # Baseline search implementation
-db.sqlite             # SQLite database for metadata
-embed_index.py        # Embedding and FAISS index logic
-faiss.index           # FAISS index file
-idmap.pkl             # Mapping of document IDs
-ingest.py             # Document ingestion and parsing
-reranker.py           # Reranking logic
-utils.py              # Utility functions
-Data/                 # Source PDFs and metadata
-pdfs/                 # Additional PDF resources
-```
 
-## Getting Started
 
-### Prerequisites
-- Python 3.10+
-- pip
-
-### Installation
-1. Clone the repository or copy the project files.
-2. (Optional) Create and activate a virtual environment:
-   ```powershell
-   python -m venv venv
-   .\venv\Scripts\activate
-   ```
-3. Install required packages:
-   ```powershell
-   pip install -r requirements.txt
-   ```
-   *(Create `requirements.txt` if not present, with packages like `faiss-cpu`, `numpy`, `pandas`, `fastapi`, `uvicorn`, `PyPDF2`, etc.)*
-
-### Usage
-- **Ingest Documents:**
-  ```powershell
-  python ingest.py
-  ```
-- **Build Embedding Index:**
-  ```powershell
-  python embed_index.py
-  ```
-- **Run API Server:**
-  ```powershell
-  python api.py
-  ```
-  The server will start and listen for requests (default: http://127.0.0.1:8000/).
-
-### Querying
-Use the API endpoint to submit queries and receive relevant document passages.
-
-## Data
-- Place your PDF files in `Data/industrial-safety-pdfs/` or `pdfs/`.
-- Metadata and sources are tracked in `Data/sources.json`.
-
-## License
-Specify your license here (e.g., MIT, Apache 2.0).
-
-## Acknowledgements
-- Inspired by retrieval-augmented generation research and open-source projects.
-- Uses FAISS for vector search and FastAPI/Flask for the API layer.

@@ -6,6 +6,21 @@ This project implements a **mini Retrieval-Augmented Generation (RAG)** pipeline
 
 
 ---
+   
+##  Repository Structure
+         mini-rag-reranker/
+         ├─ data/
+         │ ├─ industrial-safety-pdfs.zip # (your PDF dataset)
+         │ ├─ sources.json # list of PDF sources (title, url/path)
+         │ └─ questions.txt # evaluation questions
+         ├─ ingest.py # ingest + chunk -> sqlite
+         ├─ embed_index.py # embeddings + FAISS index
+         ├─ baseline_search.py # baseline cosine similarity search
+         ├   ─ reranker.py # hybrid reranker (FAISS + BM25)
+         ├─ api.py # FastAPI server with POST /ask
+         ├─ streamlit_app.py # Streamlit frontend for Q&A
+         ├─ utils.py # helper functions
+         └─ README.md
 
 ## 🚀 Setup
 
@@ -14,8 +29,8 @@ This project implements a **mini Retrieval-Augmented Generation (RAG)** pipeline
    ```bash
    git clone https://github.com/your-username/mini-rag-reranker.git
    cd mini-rag-reranker
-
-##Usage
+---
+## Usage
 1. Ingest PDFs
 
 Parses sources.json, downloads/loads PDFs, chunks them, and saves to db.sqlite.
@@ -76,6 +91,7 @@ Tricky query:
 - **Reranking:** Improves search results using a reranker module.
 - **Baseline Search:** Provides a baseline search method for comparison.
 - **SQLite Database:** Stores metadata and indexing information.
+
 
 
 
